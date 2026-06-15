@@ -1,1 +1,52 @@
+THIS SCRIPT CREATE THE BRONZE LAYER TABLES. 
 
+DECLARE @start_time DATETIME, @end_time DATETIME, @batch_start_time DATETIME, @batch_end_time DATETIME;
+BEGIN TRY
+SET @batch_start_time = GETDATE() ; 
+	PRINT '================================='
+	PRINT 'LOADING Bronze Layer'
+	PRINT '================================='
+
+
+	PRINT '================================='
+	PRINT 'LOADING CRM DATA'
+	PRINT ' ================================'
+
+	SET @start_time = GETDATE();
+	TRUNCATE TABLE bronze.crm_cust_info;
+	BULK INSERT bronze.crm_cust_info
+	FROM 'C:\Program Files\Microsoft SQL Server\SQL Data Engineering Project\source_crm\cust_info.csv'
+	WITH(
+		FIRSTROW = 2, -- TELLING SQL TO SKIP THE FIRST ROW
+		FIELDTERMINATOR = ',' , -- THIS TELLS SQL HOW THE DATA IS SEPARATED
+		TABLOCK
+	);
+	SET @end_time = GETDATE();
+	PRINT '>> LOAD DURATION: ' + CAST(DATEDIFF(SECOND, @start_time, @end_time) AS NVARCHAR) + 'seconds';
+	PRINT '>> -----------------------';
+
+	SET @start_time = GETDATE();
+	TRUNCATE TABLE bronze.prd_info;
+	BULK INSERT bronze.prd_info
+	FROM 'C:\Program Files\Microsoft SQL Server\SQL Data Engineering Project\source_crm\prd_info.csv'
+	WITH(
+		FIRSTROW = 2, -- TELLING SQL TO SKIP THE FIRST ROW
+		FIELDTERMINATOR = ',', -- THIS TELLS SQL HOW THE DATA IS SEPARATED
+		TABLOCK
+	);
+	SET @end_time = GETDATE()
+	PRINT '>> LOAD DURATION: ' + CAST (DATEDIFF(second,@start_time, @end_time) AS NVARCHAR) + 'seconds';
+	PRINT '>> -----------------'
+
+	SET @start_time = GETDATE();
+	TRUNCATE TABLE bronze.sales_details;
+	BULK INSERT bronze.sales_details
+	FROM 'C:\Program Files\Microsoft SQL Server\SQL Data Engineering Project\source_crm\sales_details.csv'
+	WITH(
+		FIRSTROW = 2, -- TELLING SQL TO SKIP THE FIRST ROW
+		FIELDTERMINATOR = ',', -- THIS TELLS SQL HOW THE DATA IS SEPARATED
+		TABLOCK
+	);
+	SET @end_time = GETDATE()
+	PRINT '>> LOAD DURATION: ' + CAST (DATEDIFF(second,@start_time, @end_time) AS NVARCHAR) + 'seconds';
+	PRINT '>> -----------------';
